@@ -1,133 +1,167 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Free sleep cycle calculator to optimize your bedtime and wake-up times">
-  <meta name="keywords" content="sleep calculator, bedtime planner, sleep cycle app, free sleep tool">
-  <title>Peace Renew - Optimize Your Sleep for Free</title>
+  <meta name="description" content="Free, beautiful sleep cycle calculator for better rest">
+  <meta name="keywords" content="free sleep planner, aesthetic sleep app, sleep cycle calculator">
+  <title>Peace Renew - Beautiful Sleep Optimization</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .fade-in { animation: fadeIn 0.5s ease-in; }
+    .hover-scale { transition: transform 0.2s; }
+    .hover-scale:hover { transform: scale(1.05); }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gradient-to-b from-blue-100 to-purple-100 dark:from-gray-800 dark:to-gray-900 font-sans min-h-screen">
   <!-- Header -->
-  <header class="bg-blue-600 text-white p-4 text-center">
-    <h1 class="text-2xl font-bold">Peace Renew</h1>
-    <p class="text-sm">Your Free Sleep Cycle Planner</p>
-    <div class="bg-blue-100 text-blue-800 p-2 rounded mt-2 inline-block">No Tracking, 100% Private</div>
+  <header class="bg-blue-600 dark:bg-blue-900 text-white p-6 text-center">
+    <h1 class="text-3xl font-bold fade-in">Peace Renew</h1>
+    <p class="text-lg mt-2">Your Free, Beautiful Sleep Planner</p>
+    <div class="bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-blue-200 p-2 rounded mt-4 inline-block">No Tracking, 100% Private</div>
+    <button onclick="toggleDarkMode()" class="mt-2 text-white hover:text-yellow-300">🌙 Toggle Dark Mode</button>
   </header>
 
   <!-- Sleep Calculator -->
   <section class="p-6 max-w-4xl mx-auto">
-    <h2 class="text-xl font-semibold mb-4">Plan Your Perfect Sleep</h2>
-    <form id="sleep-form" class="bg-white p-4 rounded-lg shadow">
-      <label for="wake-time" class="block mb-2">Wake-Up Time</label>
-      <input type="time" id="wake-time" class="border p-2 w-full mb-4" value="07:30">
-      <label for="fall-asleep" class="block mb-2">Time to Fall Asleep (min)</label>
-      <select id="fall-asleep" class="border p-2 w-full mb-4">
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4 fade-in">Plan Your Perfect Sleep</h2>
+    <form id="sleep-form" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+      <label for="wake-time" class="block mb-2 text-gray-700 dark:text-gray-300">Wake-Up Time</label>
+      <input type="time" id="wake-time" class="border p-2 w-full mb-4 rounded dark:bg-gray-700 dark:text-white" value="07:30">
+      <label for="fall-asleep" class="block mb-2 text-gray-700 dark:text-gray-300">Time to Fall Asleep (min)</label>
+      <select id="fall-asleep" class="border p-2 w-full mb-4 rounded dark:bg-gray-700 dark:text-white">
         <option value="5">5</option><option value="10">10</option><option value="15" selected>15</option>
         <option value="20">20</option><option value="25">25</option><option value="30">30</option>
       </select>
-      <label for="cycle-length" class="block mb-2">Cycle Length (min)</label>
-      <select id="cycle-length" class="border p-2 w-full mb-4">
+      <label for="cycle-length" class="block mb-2 text-gray-700 dark:text-gray-300">Cycle Length (min)</label>
+      <select id="cycle-length" class="border p-2 w-full mb-4 rounded dark:bg-gray-700 dark:text-white">
         <option value="85">85</option><option value="90" selected>90</option><option value="95">95</option>
       </select>
-      <button type="submit" class="bg-blue-600 text-white p-2 rounded w-full" aria-label="Calculate Sleep Times">Calculate</button>
+      <label for="mood" class="block mb-2 text-gray-700 dark:text-gray-300">Current Mood</label>
+      <select id="mood" class="border p-2 w-full mb-4 rounded dark:bg-gray-700 dark:text-white">
+        <option value="stressed">Stressed</option><option value="calm">Calm</option>
+        <option value="anxious">Anxious</option><option value="energized">Energized</option>
+      </select>
+      <button type="submit" class="bg-blue-600 text-white p-3 rounded w-full hover-scale" aria-label="Calculate Sleep Times">Calculate</button>
     </form>
-    <div id="results" class="mt-4 text-center">
-      <!-- Results: 10:00 PM, 11:30 PM, 1:00 AM, etc. -->
+    <div id="results" class="mt-6 text-center fade-in">
+      <canvas id="sleepTimeline" class="w-full h-32"></canvas>
+      <!-- Results: Interactive timeline with bedtimes -->
     </div>
   </section>
 
-  <!-- Streaks -->
+  <!-- Sleep Streaks -->
   <section class="p-6 max-w-4xl mx-auto">
-    <h2 class="text-xl font-semibold mb-4">Your Sleep Streak</h2>
-    <div class="bg-white p-4 rounded-lg shadow text-center">
-      <p>Current Streak: <span id="streak">0</span> days</p>
-      <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-        <div class="bg-green-500 h-2.5 rounded-full" style="width: 0%"></div>
-      </div>
-      <p class="text-sm mt-2">Hit your bedtime tonight to keep the streak alive!</p>
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4 fade-in">Your Sleep Journey</h2>
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+      <p class="text-lg">Streak: <span id="streak">0</span> days</p>
+      <svg id="starrySky" class="w-full h-24 mt-4"></svg>
+      <p class="text-sm mt-2 text-gray-600 dark:text-gray-400">Follow your sleep plan tonight to earn a star!</p>
+      <p class="text-lg mt-4">Sleep Score: <span id="sleepScore">80</span>/100</p>
     </div>
   </section>
 
   <!-- Calming Sounds -->
   <section class="p-6 max-w-4xl mx-auto">
-    <h2 class="text-xl font-semibold mb-4">Calming Sounds</h2>
-    <div class="grid grid-cols-2 gap-4">
-      <button class="bg-gray-200 p-4 rounded-lg" onclick="playSound('rain')">Rain</button>
-      <button class="bg-gray-200 p-4 rounded-lg" onclick="playSound('ocean')">Ocean Waves</button>
-      <button class="bg-gray-200 p-4 rounded-lg" onclick="playSound('white-noise')">White Noise</button>
-      <button class="bg-gray-200 p-4 rounded-lg" onclick="previewPremium()">Forest (Premium)</button>
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4 fade-in">Calming Sounds</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <button class="bg-blue-200 dark:bg-blue-700 p-4 rounded-lg hover-scale" onclick="playSound('rain')">Rain</button>
+      <button class="bg-blue-200 dark:bg-blue-700 p-4 rounded-lg hover-scale" onclick="playSound('ocean')">Ocean Waves</button>
+      <button class="bg-blue-200 dark:bg-blue-700 p-4 rounded-lg hover-scale" onclick="playSound('white-noise')">White Noise</button>
+      <button class="bg-purple-200 dark:bg-purple-700 p-4 rounded-lg hover-scale" onclick="previewPremium()">Forest (Premium)</button>
     </div>
   </section>
 
-  <!-- Sleep Shop -->
+  <!-- Sleep Essentials -->
   <section class="p-6 max-w-4xl mx-auto">
-    <h2 class="text-xl font-semibold mb-4">Sleep Shop</h2>
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4 fade-in">Sleep Essentials</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="bg-white p-4 rounded-lg shadow">
-        <img src="mattress.jpg" alt="Mattress" class="w-full h-32 object-cover rounded">
-        <p>Memory Foam Mattress</p>
-        <a href="affiliate-link" class="text-blue-600">Buy Now</a>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-blue-200 dark:border-blue-600 hover-scale">
+        <img src="mattress.jpg" alt="Mattress" class="w-full h-32 object-cover rounded lazy" loading="lazy">
+        <p class="mt-2 text-gray-700 dark:text-gray-300">Memory Foam Mattress</p>
+        <a href="affiliate-link" class="text-blue-600 dark:text-blue-400">Buy Now</a>
       </div>
       <!-- More products -->
     </div>
-    <p class="text-sm text-gray-600 mt-2">We may earn a commission from purchases.</p>
+    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">We may earn a commission from purchases.</p>
   </section>
 
   <!-- Premium -->
-  <section class="p-6 max-w-4xl mx-auto bg-blue-50">
-    <h2 class="text-xl font-semibold mb-4">Upgrade to Premium</h2>
-    <ul class="list-disc pl-6 mb-4">
-      <li>Personalized Sleep Plans</li>
-      <li>Mood-Based Sound Curation</li>
-      <li>Exportable Sleep Insights</li>
-      <li>Ad-Free + Offline Sounds</li>
+  <section class="p-6 max-w-4xl mx-auto bg-blue-50 dark:bg-blue-900">
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4 fade-in">Upgrade to Premium</h2>
+    <ul class="list-disc pl-6 mb-4 text-gray-700 dark:text-gray-300">
+      <li>Custom Themes (Starry Night, Ocean Sunset)</li>
+      <li>Premium Sounds (Lofi, Guided Breathing)</li>
+      <li>Sleep Insights Dashboard</li>
+      <li>Offline Mode</li>
     </ul>
-    <button class="bg-blue-600 text-white p-2 rounded w-full">Get Premium ($2.99/mo)</button>
+    <button class="bg-blue-600 text-white p-3 rounded w-full hover-scale">Get Premium ($2.99/mo)</button>
   </section>
 
   <!-- Sleep Tips -->
   <section class="p-6 max-w-4xl mx-auto">
-    <h2 class="text-xl font-semibold mb-4">Sleep Better Tonight</h2>
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4 fade-in">Sleep Better Tonight</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="bg-white p-4 rounded-lg shadow">Dim lights 1-2 hours before bed...</div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover-scale">Dim lights 1-2 hours before bed...</div>
       <!-- More tips -->
     </div>
   </section>
 
   <!-- Share -->
   <section class="p-6 max-w-4xl mx-auto text-center">
-    <h2 class="text-xl font-semibold mb-4">Share Your Sleep Plan</h2>
-    <button class="bg-blue-600 text-white p-2 rounded mr-2" onclick="shareToX()">Share to X</button>
-    <button class="bg-blue-600 text-white p-2 rounded" onclick="shareToTwitter()">Share to Twitter</button>
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4 fade-in">Share Your Sleep Plan</h2>
+    <button class="bg-blue-600 text-white p-3 rounded mr-2 hover-scale" onclick="shareToX()">Share to X</button>
+    <button class="bg-blue-600 text-white p-3 rounded hover-scale" onclick="shareToTwitter()">Share to Twitter</button>
   </section>
 
   <!-- Footer -->
-  <footer class="bg-gray-800 text-white p-4 text-center">
-    <p>&copy; 2025 Peace Renew. No data collected. <a href="/contact">Contact</a></p>
+  <footer class="bg-gray-800 text-white p-6 text-center">
+    <p>© 2025 Peace Renew. No data collected. <a href="/contact" class="text-blue-300">Contact</a></p>
   </footer>
 
   <script>
+    // Dark Mode
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+    }
+    if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
+
     // Sleep Calculator
     document.getElementById('sleep-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const wakeTime = document.getElementById('wake-time').value;
       const fallAsleep = parseInt(document.getElementById('fall-asleep').value);
       const cycleLength = parseInt(document.getElementById('cycle-length').value);
-      // Calculate bedtimes (e.g., 4, 5, 6 cycles)
+      const mood = document.getElementById('mood').value;
+      // Calculate bedtimes (4, 5, 6 cycles)
       const results = document.getElementById('results');
-      results.innerHTML = 'Bedtimes: 10:00 PM, 11:30 PM, 1:00 AM'; // Placeholder
+      results.innerHTML = '<p class="text-gray-700 dark:text-gray-300">Bedtimes: 10:00 PM, 11:30 PM, 1:00 AM</p>';
+      // Draw timeline with Chart.js (placeholder)
+      drawSleepTimeline(wakeTime, cycleLength);
     });
+
+    function drawSleepTimeline(wakeTime, cycleLength) {
+      // Use Chart.js or D3.js to draw timeline
+      const ctx = document.getElementById('sleepTimeline').getContext('2d');
+      // Placeholder: Draw waves
+    }
 
     // Streaks
     let streak = localStorage.getItem('streak') || 0;
     document.getElementById('streak').textContent = streak;
-    // Update streak logic (e.g., check if alarm was followed)
+    function updateStarrySky() {
+      // Draw stars based on streak
+      const svg = document.getElementById('starrySky');
+      // Placeholder: Add <circle> for each streak day
+    }
 
     // Sounds
     function playSound(sound) {
       // Play sound via <audio> tag
+      const audio = new Audio(`sounds/${sound}.mp3`);
+      audio.play();
     }
     function previewPremium() {
       alert('Upgrade to Premium to unlock this sound!');
@@ -135,7 +169,10 @@
 
     // Sharing
     function shareToX() {
-      window.open('https://x.com/intent/tweet?text=I optimized my sleep with Peace Renew! Try it free at peacerenew.app');
+      window.open('https://x.com/intent/tweet?text=Just planned my perfect sleep with Peace Renew’s gorgeous app! 🌙 Try it free at peacerenew.app');
+    }
+    function shareToTwitter() {
+      window.open('https://twitter.com/intent/tweet?text=Just planned my perfect sleep with Peace Renew’s gorgeous app! 🌙 Try it free at peacerenew.app');
     }
   </script>
 </body>
