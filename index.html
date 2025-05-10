@@ -1,19 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Stunning free sleep planner with nature-inspired design">
-  <meta name="keywords" content="beautiful sleep app, free sleep cycle planner, sleep calculator">
+  <meta name="description" content="Nature-inspired free sleep planner with stunning visuals">
+  <meta name="keywords" content="nature sleep app, free sleep planner, sleep cycle calculator">
   <title>Peace Renew - Nature-Inspired Sleep Oasis</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://js.stripe.com/v3/"></script>
   <style>
     body { font-family: 'Poppins', sans-serif; }
     @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
     .breathe { animation: breathe 3s infinite; }
     .fade-in { animation: fadeIn 0.8s ease-in; }
+    .pulse { animation: pulse 2s infinite; }
     .hover-scale { transition: transform 0.2s; }
     .hover-scale:hover { transform: scale(1.05); }
     .shadow-glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
@@ -24,12 +27,20 @@
   <!-- Starry Background -->
   <canvas id="starryBg" class="fixed inset-0 z-0 opacity-50"></canvas>
 
+  <!-- Hero -->
+  <section class="relative z-10">
+    <video autoplay loop muted class="w-full h-64 object-cover opacity-70">
+      <source src="waves.mp4" type="video/mp4">
+      <img src="waves.jpg" alt="Ocean Waves" class="w-full h-64 object-cover">
+    </video>
+  </section>
+
   <!-- Header -->
-  <header class="relative bg-transparent p-6 text-center">
+  <header class="relative bg-transparent p-6 text-center z-10">
     <h1 class="text-4xl font-semibold text-white fade-in">Peace Renew</h1>
     <p class="text-lg mt-2 text-gray-300">Your Nature-Inspired Sleep Oasis</p>
     <div class="bg-blue-900 bg-opacity-50 text-white p-2 rounded mt-4 inline-block shadow-glow">No Tracking, 100% Private</div>
-    <button onclick="toggleDarkMode()" class="mt-2 text-white hover:text-yellow-300">🌙 Toggle Dark Mode</button>
+    <button onclick="toggleDarkMode()" class="mt-2 text-white hover:text-yellow-300" aria-label="Toggle Dark Mode">🌙 Dark Mode</button>
   </header>
 
   <!-- Sleep Calculator -->
@@ -55,8 +66,8 @@
       <button type="submit" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-3 rounded w-full hover-scale shadow-glow" aria-label="Calculate Sleep Times">Calculate</button>
     </form>
     <div id="results" class="mt-6 text-center fade-in">
-      <canvas id="sleepGlobe" class="w-full h-48"></canvas>
-      <!-- Interactive 3D globe or wave -->
+      <svg id="sleepWave" class="w-full h-32"></svg>
+      <!-- Wave animation with bedtimes -->
     </div>
   </section>
 
@@ -75,10 +86,10 @@
   <section class="p-6 max-w-4xl mx-auto relative z-10 parallax" style="background-image: url('ocean.jpg');">
     <h2 class="text-3xl font-semibold text-white mb-6 fade-in">Calming Sounds</h2>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <button class="bg-blue-900 bg-opacity-50 p-4 rounded-lg hover-scale shadow-glow" onclick="playSound('rain')">Rain</button>
-      <button class="bg-blue-900 bg-opacity-50 p-4 rounded-lg hover-scale shadow-glow" onclick="playSound('ocean')">Ocean Waves</button>
-      <button class="bg-blue-900 bg-opacity-50 p-4 rounded-lg hover-scale shadow-glow" onclick="playSound('white-noise')">White Noise</button>
-      <button class="bg-purple-900 bg-opacity-50 p-4 rounded-lg hover-scale shadow-glow" onclick="previewPremium()">Waterfall (Premium)</button>
+      <button class="bg-blue-900 bg-opacity-50 p-4 rounded-lg hover-scale shadow-glow" onclick="playSound('rain')" id="rain-btn">Rain</button>
+      <button class="bg-blue-900 bg-opacity-50 p-4 rounded-lg hover-scale shadow-glow" onclick="playSound('ocean')" id="ocean-btn">Ocean Waves</button>
+      <button class="bg-blue-900 bg-opacity-50 p-4 rounded-lg hover-scale shadow-glow" onclick="playSound('white-noise')" id="white-noise-btn">White Noise</button>
+      <button class="bg-purple-900 bg-opacity-50 p-4 rounded-lg hover-scale shadow-glow" onclick="checkPremium('waterfall')" id="waterfall-btn">Waterfall (Premium)</button>
     </div>
   </section>
 
@@ -87,11 +98,11 @@
     <h2 class="text-3xl font-semibold text-white mb-6 fade-in">Sleep Essentials</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="bg-white bg-opacity-10 backdrop-blur-lg p-4 rounded-lg shadow border border-blue-200 hover-scale">
-        <img src="mattress.jpg" alt="Mattress" class="w-full h-32 object-cover rounded lazy" loading="lazy">
+        <img src="https://via.placeholder.com/300x200?text=Mattress" alt="Memory Foam Mattress" class="w-full h-32 object-cover rounded lazy" loading="lazy">
         <p class="mt-2 text-white">Memory Foam Mattress</p>
         <a href="https://amzn.to/44sCX91" rel="nofollow" class="text-blue-400 hover:text-blue-300">Shop Now</a>
       </div>
-      <!-- More products via same affiliate link -->
+      <!-- Add more products if desired -->
     </div>
     <p class="text-sm text-gray-300 mt-2">As an Amazon Associate, we earn from qualifying purchases.</p>
   </section>
@@ -105,7 +116,7 @@
       <li>Harmony Dashboard</li>
       <li>Offline Mode</li>
     </ul>
-    <button class="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-3 rounded w-full hover-scale shadow-glow">Get Premium ($2.99/mo)</button>
+    <button id="get-premium" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-3 rounded w-full hover-scale shadow-glow">Get Premium ($2.99/mo)</button>
   </section>
 
   <!-- Sleep Tips -->
@@ -136,7 +147,8 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     const stars = [];
-    for (let i = 0; i < 100; i++) {
+    const maxStars = window.innerWidth < 768 ? 50 : 100;
+    for (let i = 0; i < maxStars; i++) {
       stars.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
@@ -162,9 +174,11 @@
     // Dark Mode
     function toggleDarkMode() {
       document.documentElement.classList.toggle('dark');
-      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+      localStorage.setItem('darkMode', document.documentElement.classList.contains('dark') ? 'true' : 'false');
     }
-    if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.documentElement.classList.add('dark');
+    }
 
     // Sleep Calculator
     document.getElementById('sleep-form').addEventListener('submit', (e) => {
@@ -176,21 +190,18 @@
       // Calculate bedtimes (4, 5, 6 cycles)
       const results = document.getElementById('results');
       results.innerHTML = '<p class="text-white">Bedtimes: 10:00 PM, 11:30 PM, 1:00 AM</p>';
-      drawSleepGlobe(wakeTime, cycleLength);
+      drawSleepWave(wakeTime, cycleLength);
       showMoodTip(mood);
     });
 
-    function drawSleepGlobe(wakeTime, cycleLength) {
-      // Placeholder: Use Three.js for 3D globe
-      const ctx = document.getElementById('sleepGlobe').getContext('2d');
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-      ctx.beginPath();
-      ctx.arc(100, 100, 80, 0, Math.PI * 2);
-      ctx.fill();
+    function drawSleepWave(wakeTime, cycleLength) {
+      // Draw SVG wave
+      const svg = document.getElementById('sleepWave');
+      svg.innerHTML = '<path d="M0 100 Q 50 50 100 100" fill="none" stroke="white" />';
     }
 
     function showMoodTip(mood) {
-      // Show mood-specific tip (placeholder)
+      // Placeholder: Show mood-specific tip
       console.log(`Mood: ${mood}`);
     }
 
@@ -198,19 +209,48 @@
     let streak = localStorage.getItem('streak') || 0;
     document.getElementById('streak').textContent = streak;
     function updateForestPath() {
-      // Draw forest path with SVG
+      // Draw forest path
       const svg = document.getElementById('forestPath');
-      // Placeholder: Add <path> for each streak day
+      svg.innerHTML = '<path d="M50 100 L60 80" fill="green" />';
     }
+    updateForestPath();
 
     // Sounds
     function playSound(sound) {
       const audio = new Audio(`sounds/${sound}.mp3`);
       audio.play();
+      document.getElementById(`${sound}-btn`).classList.add('pulse');
+      audio.onended = () => document.getElementById(`${sound}-btn`).classList.remove('pulse');
     }
-    function previewPremium() {
-      alert('Upgrade to Premium to unlock this sound!');
+    async function checkPremium(sound) {
+      const isPremium = await checkSubscription();
+      if (isPremium) {
+        playSound(sound);
+      } else {
+        alert('Upgrade to Premium to unlock this sound!');
+      }
     }
+
+    // Stripe Premium
+    async function checkSubscription() {
+      // Placeholder: Check Firebase for subscription status
+      return false; // Replace with actual check
+    }
+    document.getElementById('get-premium').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ priceId: 'price_1RNGveRMt9eMr1zd_monthly' })
+        });
+        const { sessionId } = await response.json();
+        const stripe = await Stripe('pk_test_51RNGveRMt9eMr1zdu1hpZSnHrULD6ujALTSOBhKm3tejc0Nm02fqtVncb9tky8uPzW5uI0Nt46OeGaS3zB3mtaEt00Wa6RVGDf');
+        stripe.redirectToCheckout({ sessionId });
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to initiate checkout. Please try again.');
+      }
+    });
 
     // Sharing
     function shareToX() {
